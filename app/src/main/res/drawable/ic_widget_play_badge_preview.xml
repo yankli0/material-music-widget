@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="54dp"
+    android:height="54dp"
+    android:viewportWidth="54"
+    android:viewportHeight="54">
+    <!-- Material 3 tonal primaryContainer circle + onPrimaryContainer play icon -->
+    <path
+        android:fillColor="#EADDFF"
+        android:pathData="M27,2 A25,25 0 1,1 26.99,2 Z" />
+    <path
+        android:fillColor="#21005D"
+        android:pathData="M22,17.5 L37.5,27 L22,36.5 Z" />
+</vector>

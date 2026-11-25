@@ -1,0 +1,6 @@
+{
+  "name": "Vinyl Orbit",
+  "description": "Circular turntable-style home screen music widget with per-app cover art filtering, bottom-left play/stop controls, and source service icon badge.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

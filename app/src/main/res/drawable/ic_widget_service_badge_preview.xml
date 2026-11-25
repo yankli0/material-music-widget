@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="46dp"
+    android:height="46dp"
+    android:viewportWidth="46"
+    android:viewportHeight="46">
+    <!-- Material 3 tonal secondaryContainer circle + onSecondaryContainer music note -->
+    <path
+        android:fillColor="#E8DEF8"
+        android:pathData="M23,2 A21,21 0 1,1 22.99,2 Z" />
+    <path
+        android:fillColor="#1D192B"
+        android:pathData="M23,13v9.2c-0.55,-0.32 -1.2,-0.5 -1.9,-0.5 -2.1,0 -3.8,1.7 -3.8,3.8s1.7,3.8 3.8,3.8 3.8,-1.7 3.8,-3.8v-8.8h3.8v-3.7h-5.7z" />
+</vector>

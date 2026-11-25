@@ -1,0 +1,82 @@
+<resources>
+    <string name="app_name">Vinyl Orbit</string>
+    <string name="widget_name">Vinyl Orbit Circle</string>
+    <string name="widget_description">Circular album cover widget with bottom-left play/stop button and source service badge.</string>
+    <string name="media_listener_label">Vinyl Orbit Media Reader</string>
+
+    <!-- Header & Navigation -->
+    <string name="home_subtitle">Circular cover widget for your music</string>
+    <string name="action_customize_widget">Customize widget</string>
+    <string name="action_back">Back</string>
+    <string name="action_refresh">Refresh</string>
+
+    <!-- Notification Access Banner -->
+    <string name="permission_needed_title">Enable Media Access</string>
+    <string name="permission_needed_body">Allow Vinyl Orbit to read active playback cover art and controls from your selected music apps.</string>
+    <string name="permission_grant_button">Grant Access</string>
+    <string name="permission_active_badge">Media active</string>
+    <string name="permission_missing_badge">Access required</string>
+
+    <!-- Widget Hero Stage -->
+    <string name="widget_stage_label">Live widget preview</string>
+    <string name="widget_idle_title">Waiting for music</string>
+    <string name="widget_idle_subtitle">Play from an allowed app to show its cover art</string>
+    <string name="widget_pin_button">Add widget</string>
+    <string name="widget_pin_unsupported_title">Add from Home Screen</string>
+    <string name="widget_pin_unsupported_body">Long-press an empty space on your home screen, choose Widgets, and drag Vinyl Orbit Circle onto your screen.</string>
+    <string name="widget_pin_requested_toast">Follow the prompt to place Vinyl Orbit on your home screen.</string>
+    <string name="action_got_it">Got it</string>
+
+    <!-- Material-Adapted Vinyl Empty State Picker -->
+    <string name="section_vinyl_empty_title">Idle vinyl style</string>
+    <string name="section_vinyl_empty_subtitle">Adapts automatically to your Material You colors</string>
+    <string name="vinyl_style_classic_tonal">Classic</string>
+    <string name="vinyl_style_expressive_scallop">Scallop</string>
+    <string name="vinyl_style_duo_tonal">Duo Tone</string>
+    <string name="vinyl_style_minimal_surface">Minimal</string>
+    <string name="vinyl_preset_custom">My Photo</string>
+    <string name="action_pick_custom_vinyl">Pick image</string>
+    <string name="custom_vinyl_saved_toast">Custom idle vinyl image updated.</string>
+    <string name="custom_vinyl_error_toast">Could not load that image file.</string>
+
+    <!-- App Filtering Sections -->
+    <string name="section_top_apps_title">Top Music Apps</string>
+    <string name="section_top_apps_subtitle">Only selected apps can display cover art on the widget</string>
+    <string name="section_other_enabled_title">Also Allowed</string>
+    <string name="action_show_all_apps">Show all apps</string>
+    <string name="show_all_apps_subtitle">Browse and toggle any app on your device</string>
+    <string name="status_installed">Installed</string>
+    <string name="status_not_installed">Not installed</string>
+    <string name="badge_pinned">Top</string>
+    <string name="badge_media">Media</string>
+    <string name="active_count_format">%1$d active</string>
+    <string name="installed_count_format">%1$d apps on device</string>
+
+    <!-- All Apps Screen -->
+    <string name="all_apps_title">All Apps</string>
+    <string name="search_apps_placeholder">Search apps or packages</string>
+    <string name="filter_all">All</string>
+    <string name="filter_music">Music</string>
+    <string name="filter_enabled">Enabled</string>
+    <string name="action_reset_defaults">Reset Top 3</string>
+    <string name="empty_search_title">No matching apps</string>
+    <string name="empty_search_subtitle">Try a different search or switch filter tabs.</string>
+
+    <!-- Customize Sheet -->
+    <string name="customize_sheet_title">Widget Settings</string>
+    <string name="customize_button_style_label">Bottom-left control icon</string>
+    <string name="style_stop_play">Stop / Play</string>
+    <string name="style_pause_play">Pause / Play</string>
+    <string name="customize_clear_on_pause_title">Show idle vinyl when stopped</string>
+    <string name="customize_clear_on_pause_subtitle">Replace the last album cover with your idle vinyl disc when playback pauses</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_album_art">Album cover art</string>
+    <string name="cd_play_button">Play music</string>
+    <string name="cd_stop_button">Stop or pause music</string>
+    <string name="cd_service_badge">Open music service</string>
+    <string name="cd_clear_search">Clear search</string>
+    <string name="cd_app_icon">App icon</string>
+    <string name="cd_vinyl_preset">Idle vinyl style option</string>
+    <string name="cd_remove_app">Remove app</string>
+</resources>

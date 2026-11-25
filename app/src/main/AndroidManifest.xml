@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Normal install-time permission for loading https:// album art URIs from browsers like Chrome -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Play-policy compliant package visibility for music services & launcher apps -->
+    <queries>
+        <!-- Curated top & popular music streaming services -->
+        <package android:name="com.google.android.apps.youtube.music" />
+        <package android:name="com.spotify.music" />
+        <package android:name="com.aspiro.tidal" />
+        <package android:name="com.apple.android.music" />
+        <package android:name="com.soundcloud.android" />
+        <package android:name="deezer.android.app" />
+        <package android:name="com.amazon.mp3" />
+        <package android:name="com.pandora.android" />
+        <package android:name="com.qobuz.music" />
+        <package android:name="com.bandcamp.android" />
+        <package android:name="com.google.android.youtube" />
+        <package android:name="org.videolan.vlc" />
+        <package android:name="com.maxmpz.audioplayer" />
+        <package android:name="com.audible.application" />
+        <package android:name="com.pocketcasts.android" />
+
+        <!-- MediaBrowserService & media-capable apps -->
+        <intent>
+            <action android:name="android.media.browse.MediaBrowserService" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.MEDIA_BUTTON" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.APP_MUSIC" />
+        </intent>
+        <!-- Launchable apps for the user-controlled "Show all apps" filter list -->
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MyApplication">
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.MyApplication">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- NotificationListenerService for real-time MediaSession playback & album art -->
+        <service
+            android:name=".media.MediaSessionListenerService"
+            android:exported="true"
+            android:label="@string/media_listener_label"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
+
+        <!-- Circle Turntable Home Screen App Widget -->
+        <receiver
+            android:name=".widget.CircleMusicWidgetProvider"
+            android:exported="true"
+            android:label="@string/widget_name">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="com.example.widget.ACTION_TOGGLE_PLAY_STOP" />
+                <action android:name="com.example.widget.ACTION_OPEN_SOURCE_APP" />
+                <action android:name="com.example.widget.ACTION_REFRESH_WIDGET" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/circle_widget_info" />
+        </receiver>
+    </application>
+
+</manifest>

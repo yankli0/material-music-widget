@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <path
+        android:fillColor="#22222E"
+        android:pathData="M24,3 A21,21 0 1,1 23.99,3 Z"
+        android:strokeWidth="2.5"
+        android:strokeColor="#F5A623" />
+    <!-- Clean musical eighth note -->
+    <path
+        android:fillColor="#F5A623"
+        android:pathData="M22,15 L33,13 L33,28.5 C33,31 30.8,33 28.2,33 C25.8,33 24,31.4 24,29.3 C24,27.2 25.8,25.6 28.2,25.6 C29.1,25.6 29.9,25.8 30.5,26.2 L30.5,18.2 L24.5,19.4 L24.5,31 C24.5,33.5 22.3,35.5 19.7,35.5 C17.3,35.5 15.5,33.9 15.5,31.8 C15.5,29.7 17.3,28.1 19.7,28.1 C20.6,28.1 21.4,28.3 22,28.7 Z" />
+</vector>

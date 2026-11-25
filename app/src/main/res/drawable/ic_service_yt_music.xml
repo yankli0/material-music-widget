@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Outer obsidian ring -->
+    <path
+        android:fillColor="#FF0033"
+        android:pathData="M24,3 A21,21 0 1,1 23.99,3 Z"
+        android:strokeWidth="2.5"
+        android:strokeColor="#121218" />
+    <!-- Inner white ring -->
+    <path
+        android:fillColor="#00000000"
+        android:pathData="M24,11 A13,13 0 1,1 23.99,11 Z"
+        android:strokeWidth="2.2"
+        android:strokeColor="#FFFFFF" />
+    <!-- Center play triangle -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M20.5,17.5 L31.5,24 L20.5,30.5 Z" />
+</vector>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="1dp">
+
+    <!--
+        Square anchor container whose width/height and child margins scale dynamically
+        with the widget's resized dimensions in CircleMusicWidgetProvider so the circular
+        vinyl/album art fills the widget while keeping the bottom-left Play/Stop
+        button and top-right Service badge diagonally aligned to the circle perimeter.
+    -->
+    <FrameLayout
+        android:id="@+id/widget_circle_anchor"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center">
+
+        <!-- Center round album art / Material-adapted vinyl disc -->
+        <ImageView
+            android:id="@+id/widget_album_art"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_margin="4dp"
+            android:contentDescription="@string/cd_album_art"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_widget_preview_disc" />
+
+        <!-- Bottom-left Stop / Play circular button anchored to the 135 deg rim -->
+        <ImageView
+            android:id="@+id/widget_play_stop_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="bottom|start"
+            android:layout_marginStart="9dp"
+            android:layout_marginBottom="9dp"
+            android:contentDescription="@string/cd_play_button"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_widget_play_badge_preview" />
+
+        <!-- Top-right Service Source icon badge anchored to the -45 deg rim -->
+        <ImageView
+            android:id="@+id/widget_service_badge"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_gravity="top|end"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="12dp"
+            android:contentDescription="@string/cd_service_badge"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_widget_service_badge_preview" />
+
+    </FrameLayout>
+
+</FrameLayout>
