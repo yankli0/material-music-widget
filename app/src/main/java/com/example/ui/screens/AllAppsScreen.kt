@@ -163,6 +163,11 @@ fun AllAppsScreen(
                                 index = index,
                                 count = filterOptions.size
                             ),
+                            colors = SegmentedButtonDefaults.colors(
+                                activeContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                activeContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                activeBorderColor = MaterialTheme.colorScheme.primary
+                            ),
                             modifier = Modifier.testTag("filter_chip_${filter.name.lowercase()}")
                         ) {
                             Text(text = label, maxLines = 1)

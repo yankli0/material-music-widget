@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapShader
 import android.graphics.Canvas
+import android.graphics.CornerPathEffect
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Path
@@ -39,7 +40,7 @@ object WidgetBitmapRenderer {
         val output = Bitmap.createBitmap(safeSize, safeSize, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(output)
         val center = safeSize / 2f
-        val radius = center - safeSize * 0.006f
+        val radius = (center - 1f).coerceAtLeast(1f)
 
         val activeBitmap = albumArt?.takeIf { !it.isRecycled }
         val customPhoto = if (activeBitmap == null && emptyVinylStyle == EmptyVinylStyle.CUSTOM_PHOTO) {
@@ -83,23 +84,30 @@ object WidgetBitmapRenderer {
         context: Context,
         isPlaying: Boolean,
         buttonStyle: ActionButtonStyle,
-        sizePx: Int = 144
+        sizePx: Int = 160
     ): Bitmap {
-        val safeSize = sizePx.coerceIn(96, 256)
+        val safeSize = sizePx.coerceIn(96, 288)
         val output = Bitmap.createBitmap(safeSize, safeSize, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(output)
         val center = safeSize / 2f
         val palette = MaterialVinylPalette.fromContext(context)
-        val radius = center - safeSize * 0.04f
+        val inset = 1.5f
+        val drawSize = (safeSize - inset * 2f).coerceAtLeast(1f)
+        val cornerRadius = drawSize * 0.33f
 
         val fillColor = if (isPlaying) palette.primary else palette.primaryContainer
-        val glyphColor = if (isPlaying) palette.onPrimary else palette.onPrimaryContainer
+        val glyphColor = when {
+            isPlaying -> palette.onPrimary
+            palette.isDark -> palette.onPrimaryContainer
+            else -> palette.primary
+        }
 
         val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = fillColor
             style = Paint.Style.FILL
         }
-        canvas.drawCircle(center, center, radius, bgPaint)
+        val bgRect = RectF(inset, inset, safeSize - inset, safeSize - inset)
+        canvas.drawRoundRect(bgRect, cornerRadius, cornerRadius, bgPaint)
 
         val glyphPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = glyphColor
@@ -108,15 +116,15 @@ object WidgetBitmapRenderer {
 
         if (isPlaying) {
             if (buttonStyle == ActionButtonStyle.STOP_PLAY) {
-                val half = safeSize * 0.175f
-                val corner = safeSize * 0.06f
+                val half = safeSize * 0.12f
+                val corner = safeSize * 0.04f
                 val rect = RectF(center - half, center - half, center + half, center + half)
                 canvas.drawRoundRect(rect, corner, corner, glyphPaint)
             } else {
-                val barW = safeSize * 0.105f
-                val barH = safeSize * 0.35f
-                val gap = safeSize * 0.085f
-                val corner = safeSize * 0.04f
+                val barW = safeSize * 0.075f
+                val barH = safeSize * 0.255f
+                val gap = safeSize * 0.068f
+                val corner = safeSize * 0.03f
                 val leftBar = RectF(
                     center - gap / 2f - barW,
                     center - barH / 2f,
@@ -133,15 +141,16 @@ object WidgetBitmapRenderer {
                 canvas.drawRoundRect(rightBar, corner, corner, glyphPaint)
             }
         } else {
-            val triHeight = safeSize * 0.38f
-            val triWidth = safeSize * 0.32f
-            val offsetX = safeSize * 0.04f
+            val triHeight = safeSize * 0.25f
+            val triWidth = safeSize * 0.215f
+            val offsetX = safeSize * 0.02f
             val path = Path().apply {
                 moveTo(center - triWidth / 2f + offsetX, center - triHeight / 2f)
                 lineTo(center + triWidth / 2f + offsetX, center)
                 lineTo(center - triWidth / 2f + offsetX, center + triHeight / 2f)
                 close()
             }
+            glyphPaint.pathEffect = CornerPathEffect(safeSize * 0.025f)
             canvas.drawPath(path, glyphPaint)
         }
 
@@ -150,26 +159,25 @@ object WidgetBitmapRenderer {
 
     /**
      * Renders a Material You monochrome themed circular service badge:
-     *  - Background circle: palette.secondaryContainer
-     *  - Foreground glyph: palette.onSecondaryContainer (using curated monochrome glyph
-     *    for YT Music / Spotify / TIDAL / Idle, or the app's Android 13+ monochrome adaptive
-     *    icon layer if available, falling back to a cleanly tinted silhouette).
+     *  - Background circle: palette.tertiaryContainer (soft pastel tertiary accent)
+     *  - Foreground glyph: palette.tertiary (light) / palette.onTertiaryContainer (dark)
      */
     fun renderServiceBadge(
         context: Context,
         packageName: String?,
         sizePx: Int = 128
     ): Bitmap {
-        val safeSize = sizePx.coerceIn(84, 224)
+        val safeSize = sizePx.coerceIn(84, 240)
         val output = Bitmap.createBitmap(safeSize, safeSize, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(output)
         val center = safeSize / 2f
-        val radius = center - safeSize * 0.04f
+        val radius = (center - 1.5f).coerceAtLeast(1f)
         val palette = MaterialVinylPalette.fromContext(context)
+        val glyphTint = if (palette.isDark) palette.onTertiaryContainer else palette.tertiary
 
-        // Material 3 tonal circular badge background
+        // Material 3 tertiaryContainer circular badge background
         val bgPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-            color = palette.secondaryContainer
+            color = palette.tertiaryContainer
             style = Paint.Style.FILL
         }
         canvas.drawCircle(center, center, radius, bgPaint)
@@ -184,20 +192,20 @@ object WidgetBitmapRenderer {
                 context.packageManager.getApplicationIcon(packageName)
             }.getOrNull()
             if (appIcon != null) {
-                if (drawMonochromeAdaptiveIcon(canvas, appIcon, safeSize, palette.onSecondaryContainer)) {
+                if (drawMonochromeAdaptiveIcon(canvas, appIcon, safeSize, glyphTint)) {
                     return output
                 }
-                drawTintedIconFallback(canvas, appIcon, safeSize, palette.onSecondaryContainer)
+                drawTintedIconFallback(canvas, appIcon, safeSize, glyphTint)
                 return output
             }
         }
 
-        // Draw curated monochrome Material You glyph tinted in onSecondaryContainer
+        // Draw curated monochrome Material You glyph tinted in tertiary / onTertiaryContainer
         val glyphRes = CuratedMusicApps.monochromeGlyphFor(packageName)
         val drawable = ContextCompat.getDrawable(context, glyphRes)?.mutate()
         if (drawable != null) {
-            DrawableCompat.setTint(drawable, palette.onSecondaryContainer)
-            val pad = (safeSize * 0.22f).toInt()
+            DrawableCompat.setTint(drawable, glyphTint)
+            val pad = (safeSize * 0.27f).toInt()
             drawable.setBounds(pad, pad, safeSize - pad, safeSize - pad)
             drawable.draw(canvas)
         }
@@ -214,8 +222,8 @@ object WidgetBitmapRenderer {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && appIcon is AdaptiveIconDrawable) {
             val mono = appIcon.monochrome?.constantState?.newDrawable()?.mutate() ?: return false
             mono.colorFilter = PorterDuffColorFilter(tintColor, PorterDuff.Mode.SRC_IN)
-            // Adaptive icon layers include 18% inset margin per side, so expand slightly to fill cleanly
-            val inset = (sizePx * 0.06f).toInt()
+            // Adaptive icon layers include 18% inset margin per side, so expand cleanly to fill
+            val inset = (sizePx * 0.11f).toInt()
             mono.setBounds(inset, inset, sizePx - inset, sizePx - inset)
             mono.draw(canvas)
             return true
@@ -229,7 +237,7 @@ object WidgetBitmapRenderer {
         sizePx: Int,
         tintColor: Int
     ) {
-        val pad = (sizePx * 0.22f).toInt()
+        val pad = (sizePx * 0.27f).toInt()
         val innerSize = (sizePx - pad * 2).coerceAtLeast(1)
         val temp = Bitmap.createBitmap(innerSize, innerSize, Bitmap.Config.ARGB_8888)
         val tempCanvas = Canvas(temp)

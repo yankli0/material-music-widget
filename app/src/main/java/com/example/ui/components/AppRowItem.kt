@@ -2,7 +2,6 @@ package com.example.ui.components
 
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -83,14 +82,7 @@ fun SelectableAppRow(
     shape: Shape = RoundedCornerShape(24.dp),
     modifier: Modifier = Modifier
 ) {
-    val containerColor by animateColorAsState(
-        targetValue = if (item.isAllowed) {
-            MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.55f)
-        } else {
-            MaterialTheme.colorScheme.surfaceContainerLow
-        },
-        label = "app_row_bg"
-    )
+    val containerColor = MaterialTheme.colorScheme.surfaceContainerLow
 
     Surface(
         shape = shape,
@@ -192,7 +184,7 @@ fun RemovableAllowedAppRow(
     shape: Shape = RoundedCornerShape(24.dp),
     modifier: Modifier = Modifier
 ) {
-    val containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.55f)
+    val containerColor = MaterialTheme.colorScheme.surfaceContainerLow
 
     Surface(
         shape = shape,
@@ -279,16 +271,8 @@ private fun AppIconAvatar(
         }
     }
 
-    val avatarBg = if (item.isAllowed) {
-        MaterialTheme.colorScheme.primaryContainer
-    } else {
-        MaterialTheme.colorScheme.surfaceContainerHighest
-    }
-    val glyphTint = if (item.isAllowed) {
-        MaterialTheme.colorScheme.onPrimaryContainer
-    } else {
-        MaterialTheme.colorScheme.onSurfaceVariant
-    }
+    val avatarBg = MaterialTheme.colorScheme.surfaceContainerHighest
+    val glyphTint = MaterialTheme.colorScheme.onSurfaceVariant
 
     Box(
         modifier = Modifier

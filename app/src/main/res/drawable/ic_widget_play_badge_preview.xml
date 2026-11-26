@@ -4,11 +4,11 @@
     android:height="54dp"
     android:viewportWidth="54"
     android:viewportHeight="54">
-    <!-- Material 3 tonal primaryContainer circle + onPrimaryContainer play icon -->
+    <!-- Material 3 rounded-square primaryContainer FAB + primary play icon -->
     <path
-        android:fillColor="#EADDFF"
-        android:pathData="M27,2 A25,25 0 1,1 26.99,2 Z" />
+        android:fillColor="#D3E3FD"
+        android:pathData="M16,0.5 L38,0.5 Q53.5,0.5 53.5,16 L53.5,38 Q53.5,53.5 38,53.5 L16,53.5 Q0.5,53.5 0.5,38 L0.5,16 Q0.5,0.5 16,0.5 Z" />
     <path
-        android:fillColor="#21005D"
-        android:pathData="M22,17.5 L37.5,27 L22,36.5 Z" />
+        android:fillColor="#0B57D0"
+        android:pathData="M21.5,19.2 L35.5,27 L21.5,34.8 Z" />
 </vector>

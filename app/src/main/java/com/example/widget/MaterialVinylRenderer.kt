@@ -19,6 +19,7 @@ import kotlin.math.sin
  * so procedural vinyl discs and widget buttons match the user's Android dynamic wallpaper palette.
  */
 data class MaterialVinylPalette(
+    val isDark: Boolean = false,
     val primary: Int,
     val onPrimary: Int,
     val primaryContainer: Int,
@@ -44,6 +45,7 @@ data class MaterialVinylPalette(
                 fun sys(resId: Int): Int = ContextCompat.getColor(context, resId)
                 return if (isDark) {
                     MaterialVinylPalette(
+                        isDark = true,
                         primary = sys(android.R.color.system_accent1_200),
                         onPrimary = sys(android.R.color.system_accent1_800),
                         primaryContainer = sys(android.R.color.system_accent1_700),
@@ -62,6 +64,7 @@ data class MaterialVinylPalette(
                     )
                 } else {
                     MaterialVinylPalette(
+                        isDark = false,
                         primary = sys(android.R.color.system_accent1_600),
                         onPrimary = sys(android.R.color.system_neutral1_0),
                         primaryContainer = sys(android.R.color.system_accent1_100),
@@ -84,6 +87,7 @@ data class MaterialVinylPalette(
             // Material 3 tonal fallback for API < 31
             return if (isDark) {
                 MaterialVinylPalette(
+                    isDark = true,
                     primary = 0xFFD0BCFF.toInt(),
                     onPrimary = 0xFF381E72.toInt(),
                     primaryContainer = 0xFF4F378B.toInt(),
@@ -102,6 +106,7 @@ data class MaterialVinylPalette(
                 )
             } else {
                 MaterialVinylPalette(
+                    isDark = false,
                     primary = 0xFF6750A4.toInt(),
                     onPrimary = 0xFFFFFFFF.toInt(),
                     primaryContainer = 0xFFEADDFF.toInt(),

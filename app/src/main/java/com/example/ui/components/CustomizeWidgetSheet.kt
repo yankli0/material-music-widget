@@ -80,6 +80,11 @@ fun CustomizeWidgetSheet(
                                 index = index,
                                 count = buttonOptions.size
                             ),
+                            colors = SegmentedButtonDefaults.colors(
+                                activeContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                activeContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                activeBorderColor = MaterialTheme.colorScheme.primary
+                            ),
                             modifier = Modifier.testTag("button_style_${style.key}")
                         ) {
                             Text(text = label, maxLines = 1)

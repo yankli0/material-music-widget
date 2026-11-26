@@ -14,11 +14,12 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
@@ -38,11 +39,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -139,13 +142,14 @@ fun CircleWidgetPreview(
         label = "play_btn_scale"
     )
 
-    val radius = discDiameter / 2f
-    val buttonSize = 60.dp
-    val badgeSize = 50.dp
-    val containerSize = discDiameter + 20.dp
+    val context = LocalContext.current
+    val isDark = isSystemInDarkTheme()
+    val widgetPalette = remember(context, isDark) { MaterialVinylPalette.fromContext(context) }
+    val buttonSize = discDiameter * 0.325f
+    val badgeSize = discDiameter * 0.26f
 
     Box(
-        modifier = modifier.size(containerSize),
+        modifier = modifier.size(discDiameter),
         contentAlignment = Alignment.Center
     ) {
         // CENTER: Borderless circular album art or Material-adapted idle vinyl disc
@@ -202,16 +206,16 @@ fun CircleWidgetPreview(
             }
         }
 
-        // BOTTOM-LEFT: Stop / Pause / Play button aligned directly to the 135 deg circle rim
+        // BOTTOM-LEFT: M3 rounded-square Stop / Pause / Play FAB flush to bottom-start tangent
         val buttonContainerColor = if (activeMedia.isPlaying) {
-            MaterialTheme.colorScheme.primary
+            Color(widgetPalette.primary)
         } else {
-            MaterialTheme.colorScheme.primaryContainer
+            Color(widgetPalette.primaryContainer)
         }
-        val buttonContentColor = if (activeMedia.isPlaying) {
-            MaterialTheme.colorScheme.onPrimary
-        } else {
-            MaterialTheme.colorScheme.onPrimaryContainer
+        val buttonContentColor = when {
+            activeMedia.isPlaying -> Color(widgetPalette.onPrimary)
+            isDark -> Color(widgetPalette.onPrimaryContainer)
+            else -> Color(widgetPalette.primary)
         }
         val controlIcon = when {
             !activeMedia.isPlaying -> Icons.Rounded.PlayArrow
@@ -226,13 +230,12 @@ fun CircleWidgetPreview(
 
         Surface(
             onClick = onPlayStopClick,
-            shape = CircleShape,
+            shape = RoundedCornerShape(percent = 33),
             color = buttonContainerColor,
             contentColor = buttonContentColor,
-            shadowElevation = 6.dp,
+            shadowElevation = 4.dp,
             modifier = Modifier
-                .align(Alignment.Center)
-                .offset(x = -(radius * 0.636f), y = radius * 0.636f)
+                .align(Alignment.BottomStart)
                 .scale(playButtonScale)
                 .size(buttonSize)
                 .testTag("widget_preview_play_stop_button")
@@ -241,20 +244,21 @@ fun CircleWidgetPreview(
                 Icon(
                     imageVector = controlIcon,
                     contentDescription = controlCd,
-                    modifier = Modifier.size(30.dp)
+                    modifier = Modifier.size(buttonSize * 0.38f)
                 )
             }
         }
 
-        // TOP-RIGHT: Source service icon badge aligned diagonally opposite at -45 deg rim
+        // TOP-RIGHT: Tertiary-tinted circular source service badge flush to top-end tangent
         ServiceSourceBadge(
             packageName = activeMedia.packageName,
             loadAppIcon = loadAppIcon,
             onClick = onServiceClick,
             badgeSize = badgeSize,
+            containerColor = Color(widgetPalette.tertiaryContainer),
+            glyphColor = if (isDark) Color(widgetPalette.onTertiaryContainer) else Color(widgetPalette.tertiary),
             modifier = Modifier
-                .align(Alignment.Center)
-                .offset(x = radius * 0.636f, y = -(radius * 0.636f))
+                .align(Alignment.TopEnd)
                 .testTag("widget_preview_service_badge")
         )
     }
@@ -266,6 +270,8 @@ private fun ServiceSourceBadge(
     loadAppIcon: suspend (String) -> Drawable?,
     onClick: () -> Unit,
     badgeSize: Dp,
+    containerColor: Color,
+    glyphColor: Color,
     modifier: Modifier = Modifier
 ) {
     val useCuratedGlyph = packageName == null ||
@@ -302,9 +308,9 @@ private fun ServiceSourceBadge(
     Surface(
         onClick = onClick,
         shape = CircleShape,
-        color = MaterialTheme.colorScheme.secondaryContainer,
-        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-        shadowElevation = 6.dp,
+        color = containerColor,
+        contentColor = glyphColor,
+        shadowElevation = 4.dp,
         modifier = modifier.size(badgeSize)
     ) {
         Box(contentAlignment = Alignment.Center) {
@@ -313,15 +319,15 @@ private fun ServiceSourceBadge(
                 Icon(
                     bitmap = remember(customBmp) { customBmp.asImageBitmap() },
                     contentDescription = stringResource(R.string.cd_service_badge),
-                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                    modifier = Modifier.size(badgeSize * 0.58f)
+                    tint = glyphColor,
+                    modifier = Modifier.size(badgeSize * 0.46f)
                 )
             } else {
                 Icon(
                     painter = painterResource(id = CuratedMusicApps.monochromeGlyphFor(packageName)),
                     contentDescription = stringResource(R.string.cd_service_badge),
-                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
-                    modifier = Modifier.size(badgeSize * 0.56f)
+                    tint = glyphColor,
+                    modifier = Modifier.size(badgeSize * 0.46f)
                 )
             }
         }

@@ -6,10 +6,12 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.util.SizeF
 import android.util.TypedValue
+import android.view.ViewGroup
 import android.widget.RemoteViews
 import com.example.R
 import com.example.data.ActiveMediaState
@@ -172,6 +174,7 @@ class CircleMusicWidgetProvider : AppWidgetProvider() {
                             context = context,
                             widthDp = size.width,
                             heightDp = size.height,
+                            hasKnownSize = size.width > 0f && size.height > 0f,
                             settings = settings,
                             filteredState = filteredState
                         )
@@ -181,12 +184,23 @@ class CircleMusicWidgetProvider : AppWidgetProvider() {
                 }
             }
 
-            val minW = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 160).toFloat()
-            val minH = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 160).toFloat()
+            val isLandscape = context.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+            val rawW = if (isLandscape) {
+                options.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, 0)
+            } else {
+                options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, 0)
+            }
+            val rawH = if (isLandscape) {
+                options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, 0)
+            } else {
+                options.getInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, 0)
+            }
+            val hasKnownSize = rawW > 0 && rawH > 0
             val views = buildSizedRemoteViews(
                 context = context,
-                widthDp = if (minW > 0f) minW else 160f,
-                heightDp = if (minH > 0f) minH else 160f,
+                widthDp = if (rawW > 0) rawW.toFloat() else 180f,
+                heightDp = if (rawH > 0) rawH.toFloat() else 180f,
+                hasKnownSize = hasKnownSize,
                 settings = settings,
                 filteredState = filteredState
             )
@@ -197,28 +211,26 @@ class CircleMusicWidgetProvider : AppWidgetProvider() {
             context: Context,
             widthDp: Float,
             heightDp: Float,
+            hasKnownSize: Boolean,
             settings: WidgetSettings,
             filteredState: ActiveMediaState
         ): RemoteViews {
             val density = context.resources.displayMetrics.density
-            // Fill nearly the full square widget footprint while keeping diagonal rim buttons unclipped
-            val sideDp = (minOf(widthDp, heightDp) - 2f).coerceIn(112f, 480f)
-            val discDp = sideDp * 0.94f
-            val radiusDp = discDp / 2f
+            // Use MATCH_PARENT on widget_circle_anchor and trim only the aspect-ratio excess
+            // via symmetric margins so launcher padding discrepancies cancel out and the circle
+            // fills 100% of the actual rendered min(width, height).
+            val sideDp = minOf(widthDp, heightDp).coerceAtLeast(48f)
+            val extraW = if (hasKnownSize) ((widthDp - heightDp) / 2f).coerceAtLeast(0f) else 0f
+            val extraH = if (hasKnownSize) ((heightDp - widthDp) / 2f).coerceAtLeast(0f) else 0f
 
-            // Bottom-left Play/Stop button scaled smoothly with widget size & locked to 135 deg rim
-            val playBtnDp = (discDp * 0.31f).coerceIn(46f, 86f)
-            val playCenterX = sideDp * 0.50f - radiusDp * 0.636f
-            val playMarginDp = (playCenterX - playBtnDp / 2f).coerceAtLeast(0f)
+            // Bottom-left Play/Stop M3 rounded square FAB (~32.5% of circle diameter, flush bottom-start)
+            val playBtnDp = (sideDp * 0.325f).coerceIn(48f, 116f)
+            // Top-right Service badge circle (~26% of circle diameter, flush top-end)
+            val badgeDp = (sideDp * 0.26f).coerceIn(40f, 92f)
 
-            // Top-right Service badge scaled smoothly & locked to -45 deg rim (diagonal mirror)
-            val badgeDp = (discDp * 0.27f).coerceIn(40f, 74f)
-            val badgeCenterX = sideDp * 0.50f + radiusDp * 0.636f
-            val badgeMarginDp = (sideDp - (badgeCenterX + badgeDp / 2f)).coerceAtLeast(0f)
-
-            val discPx = (discDp * density).toInt().coerceIn(256, 680)
-            val playPx = (playBtnDp * density).toInt().coerceIn(112, 240)
-            val badgePx = (badgeDp * density).toInt().coerceIn(96, 200)
+            val discPx = ((sideDp + 20f) * density).toInt().coerceIn(288, 720)
+            val playPx = (playBtnDp * density).toInt().coerceIn(112, 288)
+            val badgePx = (badgeDp * density).toInt().coerceIn(96, 240)
 
             val albumBitmap = WidgetBitmapRenderer.renderCircularAlbumArt(
                 context = context,
@@ -271,11 +283,16 @@ class CircleMusicWidgetProvider : AppWidgetProvider() {
                 setImageViewBitmap(R.id.widget_service_badge, serviceBadgeBitmap)
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    setViewLayoutWidth(R.id.widget_circle_anchor, sideDp, TypedValue.COMPLEX_UNIT_DIP)
-                    setViewLayoutHeight(R.id.widget_circle_anchor, sideDp, TypedValue.COMPLEX_UNIT_DIP)
+                    val matchParent = ViewGroup.LayoutParams.MATCH_PARENT.toFloat()
+                    setViewLayoutWidth(R.id.widget_circle_anchor, matchParent, TypedValue.COMPLEX_UNIT_PX)
+                    setViewLayoutHeight(R.id.widget_circle_anchor, matchParent, TypedValue.COMPLEX_UNIT_PX)
+                    setViewLayoutMargin(R.id.widget_circle_anchor, RemoteViews.MARGIN_START, extraW, TypedValue.COMPLEX_UNIT_DIP)
+                    setViewLayoutMargin(R.id.widget_circle_anchor, RemoteViews.MARGIN_END, extraW, TypedValue.COMPLEX_UNIT_DIP)
+                    setViewLayoutMargin(R.id.widget_circle_anchor, RemoteViews.MARGIN_TOP, extraH, TypedValue.COMPLEX_UNIT_DIP)
+                    setViewLayoutMargin(R.id.widget_circle_anchor, RemoteViews.MARGIN_BOTTOM, extraH, TypedValue.COMPLEX_UNIT_DIP)
 
-                    setViewLayoutWidth(R.id.widget_album_art, discDp, TypedValue.COMPLEX_UNIT_DIP)
-                    setViewLayoutHeight(R.id.widget_album_art, discDp, TypedValue.COMPLEX_UNIT_DIP)
+                    setViewLayoutWidth(R.id.widget_album_art, matchParent, TypedValue.COMPLEX_UNIT_PX)
+                    setViewLayoutHeight(R.id.widget_album_art, matchParent, TypedValue.COMPLEX_UNIT_PX)
                     setViewLayoutMargin(R.id.widget_album_art, RemoteViews.MARGIN_START, 0f, TypedValue.COMPLEX_UNIT_DIP)
                     setViewLayoutMargin(R.id.widget_album_art, RemoteViews.MARGIN_END, 0f, TypedValue.COMPLEX_UNIT_DIP)
                     setViewLayoutMargin(R.id.widget_album_art, RemoteViews.MARGIN_TOP, 0f, TypedValue.COMPLEX_UNIT_DIP)
@@ -283,33 +300,13 @@ class CircleMusicWidgetProvider : AppWidgetProvider() {
 
                     setViewLayoutWidth(R.id.widget_play_stop_button, playBtnDp, TypedValue.COMPLEX_UNIT_DIP)
                     setViewLayoutHeight(R.id.widget_play_stop_button, playBtnDp, TypedValue.COMPLEX_UNIT_DIP)
-                    setViewLayoutMargin(
-                        R.id.widget_play_stop_button,
-                        RemoteViews.MARGIN_START,
-                        playMarginDp,
-                        TypedValue.COMPLEX_UNIT_DIP
-                    )
-                    setViewLayoutMargin(
-                        R.id.widget_play_stop_button,
-                        RemoteViews.MARGIN_BOTTOM,
-                        playMarginDp,
-                        TypedValue.COMPLEX_UNIT_DIP
-                    )
+                    setViewLayoutMargin(R.id.widget_play_stop_button, RemoteViews.MARGIN_START, 0f, TypedValue.COMPLEX_UNIT_DIP)
+                    setViewLayoutMargin(R.id.widget_play_stop_button, RemoteViews.MARGIN_BOTTOM, 0f, TypedValue.COMPLEX_UNIT_DIP)
 
                     setViewLayoutWidth(R.id.widget_service_badge, badgeDp, TypedValue.COMPLEX_UNIT_DIP)
                     setViewLayoutHeight(R.id.widget_service_badge, badgeDp, TypedValue.COMPLEX_UNIT_DIP)
-                    setViewLayoutMargin(
-                        R.id.widget_service_badge,
-                        RemoteViews.MARGIN_TOP,
-                        badgeMarginDp,
-                        TypedValue.COMPLEX_UNIT_DIP
-                    )
-                    setViewLayoutMargin(
-                        R.id.widget_service_badge,
-                        RemoteViews.MARGIN_END,
-                        badgeMarginDp,
-                        TypedValue.COMPLEX_UNIT_DIP
-                    )
+                    setViewLayoutMargin(R.id.widget_service_badge, RemoteViews.MARGIN_TOP, 0f, TypedValue.COMPLEX_UNIT_DIP)
+                    setViewLayoutMargin(R.id.widget_service_badge, RemoteViews.MARGIN_END, 0f, TypedValue.COMPLEX_UNIT_DIP)
                 }
 
                 setContentDescription(R.id.widget_play_stop_button, playPauseCd)
